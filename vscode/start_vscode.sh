@@ -4,8 +4,14 @@
 # See: https://code.visualstudio.com/docs/remote/tunnels
 
 SESSION_NAME="VSCODE_TUNNEL"
-FP_VSCODE_CLI="$HOME/vscode_cli_alpine_x64_cli.tar.gz"
-URL_VSCODE_CLI='https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64'
+FP_VSCODE_CLI="$HOME/vscode_x64_cli.tar.gz"
+
+# Previous vscode CLI release
+#URL_VSCODE_CLI='https://update.code.visualstudio.com/1.85.2/cli-linux-x64/stable'
+
+# Latest vscode CLI release
+URL_VSCODE_CLI='https://update.code.visualstudio.com/latest/cli-linux-x64/stable'
+
 
 # Kill Old vscode server(s)
 tmux kill-session -t $SESSION_NAME
