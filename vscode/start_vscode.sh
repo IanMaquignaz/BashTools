@@ -33,5 +33,5 @@ fi
 
 # Run
 echo "Starting vsCode tunnel..."
-tmux new-session -s $SESSION_NAME "$HOME/code tunnel"
+tmux new-session -s $SESSION_NAME "$HOME/code tunnel --cli-data-dir .vscode_cli_data_dir_$(hostname)"
 tmux ls
