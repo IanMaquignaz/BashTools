@@ -19,32 +19,36 @@ while getopts $OPTIONS opt; do
             ;;
         h|help) # Help
             echo "Need help? There is no help. Read the code."
-            exit 0 
+            exit 0
             ;;
     esac
 done
 shift $((OPTIND-1)) # remove options that have already been handled from $@
 
 function _gpu_process_kill {
-	local PIDs="$1"
-	if [[ -z "$PIDs" ]]; then
-		echo -e "\t--> No PIDs to kill.."
-	else
-		echo -e "\t--> Killing PIDs... $PIDs"
-		echo $PIDs | xargs -n1 kill -$SIGNAL
-	fi
+	for pid in "$@"; do
+		if [[ -z "$PIDs" ]]; then
+			echo -e "\t--> No PIDs to kill.."
+		else
+			echo -e "\t--> Killing PID... $pid"
+			echo $PIDs | xargs -n1 kill -$SIGNAL
+		fi
+	done
 }
 
 
 if [[ $TARGET_ALL == true ]]; then
-	PIDs=nvidia-smi -q -x | grep pid | sed -e 's/<pid>//g' -e 's/<\/pid>//g' -e 's/^[[:space:]]*//'
+	PIDs=$(nvidia-smi -q -x | grep pid | sed -e 's/<pid>//g' -e 's/<\/pid>//g' -e 's/^[[:space:]]*//')
+	echo "Purgin processes on all GPUs"
+	_gpu_process_kill $PIDs
 else
-	for gpuID in "$@"; do
-		echo "Purgin processes on GPU:$gpuID"
-		PIDs=$(nvidia-smi -i $gpuID -q -x | grep pid | sed -e 's/<pid>//g' -e 's/<\/pid>//g' -e 's/^[[:space:]]*//')	
-		_gpu_process_kill $PIDs
+	for usr_input in "$@"; do
+		IFS=', ' read -r -a array_gpuIDs <<< "$usr_input"
+		for gpuID in "${array_gpuIDs[@]}"; do
+			PIDs=$(nvidia-smi -i $gpuID -q -x | grep pid | sed -e 's/<pid>//g' -e 's/<\/pid>//g' -e 's/^[[:space:]]*//')
+			echo "Purgin processes on GPU:$gpuID"
+			_gpu_process_kill $PIDs
+		done
 	done
 fi
 echo "Done!"
-
-
